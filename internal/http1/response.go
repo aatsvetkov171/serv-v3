@@ -8,6 +8,7 @@ import (
 var status = map[int]string{
 	200: "OK",
 	404: "Not Found",
+	405: "Method Not Allowed",
 }
 
 var DefaultHeaders = map[string]string{
@@ -23,18 +24,16 @@ type Response struct {
 	body       string
 }
 
-type Response404 struct {
-	statusCode int
-	statusMess string
-	body       string
+func NewResponse404() *Response {
+	response404 := NewResponse(404, "Not Found")
+	response404.AddHeaders(map[string]string{})
+	return response404
 }
 
-func NewResponse404() *Response404 {
-	return &Response404{
-		statusCode: 404,
-		statusMess: "Not found",
-		body:       "Not Found",
-	}
+func NewResponse405() *Response {
+	response405 := NewResponse(405, "Method Not Allowed")
+	response405.AddHeaders(map[string]string{})
+	return response405
 }
 
 func NewResponse(statusCode int, body string) *Response {
@@ -60,12 +59,6 @@ func (r *Response) Write(conn net.Conn) {
 	for k, v := range r.headers {
 		httpText += k + ":" + v + "\r\n"
 	}
-	httpText += "\r\n" + r.body
-	conn.Write([]byte(httpText))
-}
-
-func (r *Response404) Write(conn net.Conn) {
-	httpText := "HTTP/1.1 " + strconv.Itoa(r.statusCode) + " " + r.statusMess + "\r\n"
 	httpText += "\r\n" + r.body
 	conn.Write([]byte(httpText))
 }

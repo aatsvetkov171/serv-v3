@@ -23,7 +23,10 @@ func (r *Router) FindHandler(method string, path string) (HandleFunc, bool) {
 	if m, ok := r.routes[method]; ok {
 		if h, ok := m[path]; ok {
 			return h, true
+		} else {
+			return PathNotFound, true
 		}
+	} else {
+		return PathMethodNotAllowed, true
 	}
-	return nil, false
 }

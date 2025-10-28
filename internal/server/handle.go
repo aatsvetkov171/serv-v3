@@ -41,11 +41,9 @@ func handleConn(conn net.Conn, router *http1.Router) {
 		//----------------RESPONSE
 		responseFunc, ok := router.FindHandler(request.GetMethod(), request.GetPath())
 		if !ok {
-			response := http1.NewResponse(404, "Not Found")
-			response.AddHeaders(map[string]string{})
-			response.Write(conn)
 			return
 		}
+
 		response := responseFunc(&request)
 		response.Write(conn)
 

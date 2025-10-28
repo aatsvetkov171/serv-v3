@@ -1,5 +1,12 @@
 package http1
 
+func PathNotFound(r *Request) *Response {
+	return NewResponse404()
+}
+func PathMethodNotAllowed(r *Request) *Response {
+	return NewResponse405()
+}
+
 func PathHello(r *Request) *Response {
 	response := NewResponse(200, "<h1>Привет Хэндлер</h1>")
 	response.AddHeaders(DefaultHeaders)
