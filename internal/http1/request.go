@@ -71,3 +71,10 @@ func (r *Request) ReadBody(conn net.Conn, reader *bufio.Reader) {
 func (r *Request) GetBody() string {
 	return r.body
 }
+
+func (r *Request) GetPath() string {
+	return r.url
+}
+func (r *Request) GetMethod() string {
+	return r.method
+}

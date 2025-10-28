@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func handleConn(conn net.Conn) {
+func handleConn(conn net.Conn, router *http1.Router) {
 	defer func() {
 		fmt.Println("close conn", conn.RemoteAddr())
 		conn.Close()
@@ -34,18 +34,25 @@ func handleConn(conn net.Conn) {
 			fmt.Println("Server cant working with non http proto..")
 			return
 		}
+		//----------------REQUEST
 		request := http1.NewRequest(&FLineB)
 		request.GetConnHeaders(conn, reader)
 		request.ReadBody(conn, reader)
-		fmt.Println("ТЕЛО", request.GetBody())
+		//----------------RESPONSE
+		responseFunc, ok := router.FindHandler(request.GetMethod(), request.GetPath())
+		if !ok {
+			response := http1.NewResponse(404, "Not Found")
+			response.AddHeaders(map[string]string{})
+			response.Write(conn)
+			return
+		}
+		response := responseFunc(&request)
+		response.Write(conn)
 
 		if request.GetHeaders()["connection"] == "close" {
 			keepAlive = false
 		}
-		//response_content := "<h1>Hello v3</h1>"
-		response := http1.NewResponse(200, "<h1>Hello 876612412</h1>")
-		response.AddHeaders(http1.DefaultHeaders)
-		response.Write(conn)
+		//response_content := "<h1>Hello v3</h1>
 		if CountMessage >= maxCountMessage {
 			fmt.Println("Достигнут лимит кол сообщений")
 			return
